@@ -1,2 +1,4 @@
 # HomeBot
-A local multiskilled and custom trained home assistant
+Homebot is a project to build a local home assistant to help perform tasks and provide help through a voice interface.
+
+
