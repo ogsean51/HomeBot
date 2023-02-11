@@ -6,11 +6,12 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 512
 RECORD_SECONDS = 3
-WAVE_OUTPUT_FILENAME = "./Data/WakeWord/"
-COMMAND = "Homebot"
+WAVE_OUTPUT_FILENAME = "./Training/Data/WakeWord/"
+COMMAND = input("Command:")
 device_index = 2
 
-NUMBEROFFILES = 100
+START = int(input("Start at: "))
+NUMBEROFFILES = int(input("Count: "))
 
 
 def record(count):
@@ -30,7 +31,8 @@ def record(count):
     stream.stop_stream()
     stream.close()
     audio.terminate()
-    waveFile = wave.open(WAVE_OUTPUT_FILENAME + COMMAND + "/" + COMMAND + str(count) + ".wav", 'wb')
+    file = WAVE_OUTPUT_FILENAME + COMMAND + "/" + COMMAND + str(START + count) + ".wav"
+    waveFile = wave.open(file, 'wb')
     waveFile.setnchannels(CHANNELS)
     waveFile.setsampwidth(audio.get_sample_size(FORMAT))
     waveFile.setframerate(RATE)
