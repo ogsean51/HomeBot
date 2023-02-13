@@ -20,7 +20,9 @@ from datetime import datetime
 def wake():
     print("WAKE DETECTED")
 
-model = keras.models.load_model("./Training/processor.h5")
+def initialize():
+    model = keras.models.load_model("./Training/processor.h5")
+    return model
 
 def load_wav(filename):
     file_contents = tf.io.read_file(filename)
@@ -42,44 +44,29 @@ def preprocess(file_path, label):
     spectrogram = tf.expand_dims(spectrogram, axis=2)
     return spectrogram, label
 
-EVAL = os.path.join('Process')
+def process(model):
+    EVAL = os.path.join('Process')
 
-eval = tf.data.Dataset.list_files(EVAL +'/*.wav')
+    eval = tf.data.Dataset.list_files(EVAL +'/*.wav')
 
-data = tf.data.Dataset.zip((eval, tf.data.Dataset.from_tensor_slices(tf.ones(len(eval)))))
+    data = tf.data.Dataset.zip((eval, tf.data.Dataset.from_tensor_slices(tf.ones(len(eval)))))
 
-lengths = []
-for file in os.listdir(os.path.join('Process')):
-    tensor_wave = load_wav(os.path.join('Process', file))
-    lengths.append(len(tensor_wave))
+    data = data.map(preprocess)
+    data = data.cache()
+    data = data.shuffle(buffer_size=1000)
+    data = data.batch(8)
+    data = data.prefetch(8)
 
-tf.math.reduce_mean(lengths)
-tf.math.reduce_min(lengths)
-tf.math.reduce_max(lengths)
+    preds = model.predict(data)
 
-filepath, label = data.shuffle(buffer_size=10000).as_numpy_iterator().next()
-spectrogram, label = preprocess(filepath, label)
-print(filepath)
-plt.figure(figsize=(30,20))
-plt.imshow(tf.transpose(spectrogram)[0])
-plt.show
+    now = datetime.now().strftime("%d-%m-%Y")
 
-data = data.map(preprocess)
-data = data.cache()
-data = data.shuffle(buffer_size=1000)
-data = data.batch(8)
-data = data.prefetch(8)
-
-preds = model.predict(data)
-
-now = datetime.now().strftime("%d-%m-%Y")
-
-results = ['1' if x > 0.5 else 0 for x in preds]
-for i in range(len(results)):
-    results[i] = bool(results[i])
-    if(bool(results[i])):
-        wake()
-log = pd.DataFrame(preds)
-log.to_csv('Logs' + '/' + 'log ' + now + '.csv', index=False)
+    results = ['1' if x > 0.5 else 0 for x in preds]
+    for i in range(len(results)):
+        results[i] = bool(results[i])
+        if(bool(results[i])):
+            wake()
+    log = pd.DataFrame(preds)
+    log.to_csv('Logs' + '/' + 'log ' + now + '.csv', index=False)
 
 
