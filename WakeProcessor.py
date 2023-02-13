@@ -16,13 +16,36 @@ import IPython.display as ipd
 import pandas as pd
 from datetime import date
 from datetime import datetime
+import wave
+import Record
 
-def wake():
-    print("WAKE DETECTED")
+
+def log(preds):
+    now = datetime.now().strftime("%d-%m-%Y")
+    
+    log = pd.DataFrame(preds)
+    log.to_csv('Logs' + '/' + 'log ' + now + '.csv', index=False)
 
 def initialize():
     model = keras.models.load_model("./Training/processor.h5")
     return model
+
+def merge_wav():
+    infiles = os.listdir("./Process-Segments")
+    print(infiles)
+    outfile = "./Process/process.wav"
+
+    data= []
+    for infile in infiles:
+        w = wave.open("./Process-Segments/" + infile, 'rb')
+        data.append( [w.getparams(), w.readframes(w.getnframes())] )
+        w.close()
+        
+    output = wave.open(outfile, 'wb')
+    output.setparams(data[0][0])
+    for i in range(len(data)):
+        output.writeframes(data[i][1])
+    output.close()
 
 def load_wav(filename):
     file_contents = tf.io.read_file(filename)
@@ -45,8 +68,10 @@ def preprocess(file_path, label):
     return spectrogram, label
 
 def process(model):
+    
+    merge_wav()
+    
     EVAL = os.path.join('Process')
-
     eval = tf.data.Dataset.list_files(EVAL +'/*.wav')
 
     data = tf.data.Dataset.zip((eval, tf.data.Dataset.from_tensor_slices(tf.ones(len(eval)))))
@@ -59,14 +84,15 @@ def process(model):
 
     preds = model.predict(data)
 
-    now = datetime.now().strftime("%d-%m-%Y")
-
     results = ['1' if x > 0.5 else 0 for x in preds]
+    
+    os.remove("./Process/process.wav")
+    log(preds)
+    
     for i in range(len(results)):
         results[i] = bool(results[i])
         if(bool(results[i])):
-            wake()
-    log = pd.DataFrame(preds)
-    log.to_csv('Logs' + '/' + 'log ' + now + '.csv', index=False)
+            return True
+    return False
 
 
