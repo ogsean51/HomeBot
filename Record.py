@@ -31,7 +31,7 @@ def record():
     audio.terminate()
     file = WAVE_OUTPUT_FILENAME + "analyze" + str(INDEX) + ".wav"
     INDEX += 1
-    if(INDEX > 4):
+    if(INDEX > 5):
         INDEX = 0
     waveFile = wave.open(file, 'wb')
     waveFile.setnchannels(CHANNELS)
@@ -44,5 +44,5 @@ def reset():
     os.remove("./Process-Segments/analyze" + str(BOTTOM) + ".wav")
     BOTTOM += 1
     
-    if(BOTTOM > 4):
+    if(BOTTOM > 5):
         BOTTOM = 0
