@@ -1,6 +1,8 @@
 import WakeProcessor as wp
 import Record as r
 import os
+import sounddevice as sd
+
 
 def wake():
     print("WAKE")
@@ -15,7 +17,7 @@ def main():
     print("initialized \n-------------------")
     while True:
         print("running...")
-        r.record()
+        r.record(10)
         if(wp.process(model)):
             print("WAKE")
         r.reset()
