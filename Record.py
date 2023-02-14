@@ -15,7 +15,7 @@ BOTTOM = 0
 
 
 def record():
-    #print("recording via index " + str(index))
+    global INDEX
     audio = pyaudio.PyAudio()
     stream = audio.open(format=FORMAT, channels=CHANNELS,
                         rate=RATE, input=True, input_device_index=0,
@@ -41,7 +41,8 @@ def record():
     waveFile.close() 
 
 def reset():
-    os.remove("./Process-Segments/analyze" + str(BOTTOM) + ".wav")
+    global BOTTOM
+    #os.remove("./Process-Segments/analyze" + str(BOTTOM) + ".wav")
     BOTTOM += 1
     
     if(BOTTOM > 5):
