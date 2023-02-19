@@ -11,12 +11,12 @@ def wake():
 
 def main():
     print("initializing...")
-    model = wp.initialize()
+    #model = wp.initialize()
     print("initialized \n-------------------")
     while True:
         print("running...")
         r.record()
-        if(wp.process(model)):
+        if(wp.process()):
             print("WAKE")
         r.reset()
         print("reset \n-------------------")

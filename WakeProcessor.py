@@ -67,7 +67,7 @@ def preprocess(file_path, label):
     spectrogram = tf.expand_dims(spectrogram, axis=2)
     return spectrogram, label
 
-def process(model):
+def process():
     
     merge_wav()
     
@@ -82,9 +82,9 @@ def process(model):
     data = data.batch(8)
     data = data.prefetch(8)
 
-    preds = model.predict(data)
+    #preds = model.predict(data)
 
-    results = ['1' if x > 0.5 else 0 for x in preds]
+    '''results = ['1' if x > 0.5 else 0 for x in preds]
     
     os.remove("./Process/process.wav")
     log(preds)
@@ -93,6 +93,7 @@ def process(model):
         results[i] = bool(results[i])
         if(bool(results[i])):
             return True
+    return False'''
     return False
 
 
