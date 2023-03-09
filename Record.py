@@ -1,22 +1,49 @@
 import pyaudio
-import numpy as np
-from matplotlib import pyplot as plt
+import wave
+import os
 
-CHUNKSIZE = 1024 # fixed chunk size
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
+CHUNK = 512
+RECORD_SECONDS = 0.5
+WAVE_OUTPUT_FILENAME = "./Process-Segments/"
+device_index = 2
 
-# initialize portaudio
-p = pyaudio.PyAudio()
-stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100, input=True, frames_per_buffer=CHUNKSIZE)
+INDEX = 0
+BOTTOM = 0
 
-# do this as long as you want fresh samples
-data = stream.read(CHUNKSIZE)
-numpydata = np.frombuffer(data, dtype=np.int16)
 
-# plot data
-plt.plot(numpydata)
-plt.show()
+def record():
+    global INDEX
+    audio = pyaudio.PyAudio()
+    stream = audio.open(format=FORMAT, channels=CHANNELS,
+                        rate=RATE, input=True, input_device_index=0,
+                        frames_per_buffer=CHUNK)
+    Recordframes = []
 
-# close stream
-stream.stop_stream()
-stream.close()
-p.terminate()
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK)
+        Recordframes.append(data)
+
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
+    file = WAVE_OUTPUT_FILENAME + "analyze" + str(INDEX) + ".wav"
+    INDEX += 1
+    if(INDEX > 5):
+        INDEX = 0
+    waveFile = wave.open(file, 'wb')
+    waveFile.setnchannels(CHANNELS)
+    waveFile.setsampwidth(audio.get_sample_size(FORMAT))
+    waveFile.setframerate(RATE)
+    waveFile.writeframes(b''.join(Recordframes))
+    waveFile.close() 
+
+def reset():
+    global BOTTOM
+    #os.remove("./Process-Segments/analyze" + str(BOTTOM) + ".wav")
+    BOTTOM += 1
+    
+    if(BOTTOM > 5):
+        BOTTOM = 0
