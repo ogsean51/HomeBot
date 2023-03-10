@@ -8,13 +8,12 @@ RATE = 44100
 CHUNK = 512
 RECORD_SECONDS = 0.5
 WAVE_OUTPUT_FILENAME = "./Process-Segments/"
-device_index = 2
 
 INDEX = 0
 BOTTOM = 0
 
 
-def record():
+def record(device_index):
     global INDEX
     audio = pyaudio.PyAudio()
     stream = audio.open(format=FORMAT, channels=CHANNELS,

@@ -1,2 +1,5 @@
 
 Training/processor.h5
+*.tflite
+
+Training/Processor/
