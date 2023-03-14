@@ -3,3 +3,5 @@ Training/processor.h5
 *.tflite
 
 Training/Models/
+
+Training/Processor
