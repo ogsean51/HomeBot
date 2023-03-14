@@ -11,7 +11,8 @@ from pydub import AudioSegment
 import sys
 from scipy.io.wavfile import write
 
-
+#Setting to true prints more information, uses timeout
+debugMode = True
 
 chunk_duration = 0.5 # Each read length in seconds from mic.
 fs = 48000 # sampling rate for mic
@@ -32,7 +33,6 @@ run = True
 silence_threshold = 0 
 
 # Run the demo for a timeout seconds
-use_timeout = True
 timeout = time.time() + 0.5*60  # 0.5 minutes from now
 
 # Data buffer for the input wavform
@@ -63,10 +63,11 @@ def input_stream(callback):
     return stream
 
 
-def process(in_data):
-    global run, timeout, data, silence_threshold    
-    if time.time() > timeout:
-        run = False        
+def process(in_data, frame_count, time_info, status):
+    global run, timeout, data, silence_threshold, debugMode
+    if debugMode:
+        if time.time() > timeout:
+            run = False        
     data0 = np.frombuffer(in_data, dtype='int16')
     if np.abs(data0).mean() < silence_threshold:
         sys.stdout.write('-')
@@ -80,24 +81,27 @@ def process(in_data):
         q.put(data)
     return (in_data, pyaudio.paContinue)
 
+def initialize(debug):
+    global data, q, timeout, run, debugMode
+    print("Initializing...")
+    debugMode = debug
+    stream = input_stream(process)
+    stream.start_stream()
+    print("---------------------- INITIALIZED ----------------------")
 
-print("Initializing...")
-stream = input_stream(process)
-stream.start_stream()
-print("---------------------- INITIALIZED ----------------------")
-
-try:
-    while run:
-        data = q.get()
-        spectrum = get_spectrogram(data)
-        print(spectrum)
-except (KeyboardInterrupt, SystemExit):
-    print("SystemExit")
+    try:
+        while run:
+            data = q.get()
+            spectrum = get_spectrogram(data)
+            if debugMode:
+                print(spectrum)
+    except (KeyboardInterrupt, SystemExit):
+        print("SystemExit")
+        stream.stop_stream()
+        stream.close()
+        timeout = time.time()
+        run = False
+        
+    print("\n ---------------------- STOPPING ----------------------")
     stream.stop_stream()
     stream.close()
-    timeout = time.time()
-    run = False
-    
-print("\n ---------------------- STOPPING ----------------------")
-stream.stop_stream()
-stream.close()
