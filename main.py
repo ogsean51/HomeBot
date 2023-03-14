@@ -2,16 +2,7 @@ import WakeProcessor as wp
 import Record as r
 from multiprocessing import Process
 import os
-
-header =''' _   _  _____         ___       ___    _____  _____ 
-( ) ( )(  _  )/'\_/`\(  _`\    (  _`\ (  _  )(_   _)
-| |_| || ( ) ||     || (_(_)   | (_) )| ( ) |  | |  
-|  _  || | | || (_) ||  _)_    |  _ <'| | | |  | |  
-| | | || (_) || | | || (_( )   | (_) )| (_) |  | |  
-(_) (_)(_____)(_) (_)(____/'   (____/'(_____)  (_)  
-                                                    
-                                                    '''
-                                                    
+from art import *                                           
 
 def debugMode():
     debug = input("Run in debug mode? y/n         ")
@@ -29,7 +20,7 @@ def wake():
     print("CLEARED")
 
 def main():
-    print(header)
+    print(text2art('''HOME BOT''', font="larry3d"))
     #model = wp.initialize()
     r.initialize(debugMode())
 
