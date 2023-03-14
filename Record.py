@@ -28,9 +28,11 @@ q = Queue()
 
 run = True
 
-silence_threshold = 10
+#the higher this is the higher the threshold
+silence_threshold = 0 
 
 # Run the demo for a timeout seconds
+use_timeout = True
 timeout = time.time() + 0.5*60  # 0.5 minutes from now
 
 # Data buffer for the input wavform
@@ -38,15 +40,7 @@ data = np.zeros(feed_samples, dtype='int16')
 
 
 def get_spectrogram(data):
-    """
-    Function to compute a spectrogram.
     
-    Argument:
-    predictions -- one channel / dual channel audio data as numpy array
-
-    Returns:
-    pxx -- spectrogram, 2-D array, columns are the periodograms of successive segments.
-    """
     nfft = 200 # Length of each window segment
     fs = 8000 # Sampling frequencies
     noverlap = 120 # Overlap between windows
@@ -57,7 +51,7 @@ def get_spectrogram(data):
         pxx, _, _ = mlab.specgram(data[:,0], nfft, fs, noverlap = noverlap)
     return pxx
 
-def get_audio_input_stream(callback):
+def input_stream(callback):
     stream = pyaudio.PyAudio().open(
         format=pyaudio.paInt16,
         channels=1,
@@ -69,7 +63,7 @@ def get_audio_input_stream(callback):
     return stream
 
 
-def callback(in_data, frame_count, time_info, status):
+def process(in_data):
     global run, timeout, data, silence_threshold    
     if time.time() > timeout:
         run = False        
@@ -87,19 +81,16 @@ def callback(in_data, frame_count, time_info, status):
     return (in_data, pyaudio.paContinue)
 
 
-print("initializing...")
-stream = get_audio_input_stream(callback)
+print("Initializing...")
+stream = input_stream(process)
 stream.start_stream()
-print("INITIALIZED \n ----------------------")
+print("---------------------- INITIALIZED ----------------------")
 
 try:
-    print("Trying to run")
     while run:
-        print("Running")
         data = q.get()
         spectrum = get_spectrogram(data)
         print(spectrum)
-        print("^^^ Spectrum ^^^")
 except (KeyboardInterrupt, SystemExit):
     print("SystemExit")
     stream.stop_stream()
@@ -107,6 +98,6 @@ except (KeyboardInterrupt, SystemExit):
     timeout = time.time()
     run = False
     
-print("stopping")
+print("\n ---------------------- STOPPING ----------------------")
 stream.stop_stream()
 stream.close()
