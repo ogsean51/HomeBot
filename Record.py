@@ -10,16 +10,20 @@ import time
 from pydub import AudioSegment
 import sys
 from scipy.io.wavfile import write
+import tensorflow as tf
+import tensorflow_io as tfio
+import librosa
+import LiteProcessor as lp
 
 #Setting to true prints more information, uses timeout
 debugMode = True
 
-chunk_duration = 0.5 # Each read length in seconds from mic.
+chunk_duration = 3 # Each read length in seconds from mic.
 fs = 48000 # sampling rate for mic
 chunk_samples = int(fs * chunk_duration) # Each read length in number of samples.
 
 # Each model input data duration in seconds, need to be an integer numbers of chunk_duration
-feed_duration = 10
+feed_duration = 30
 feed_samples = int(fs * feed_duration)
 
 assert feed_duration/chunk_duration == int(feed_duration/chunk_duration)
@@ -30,7 +34,7 @@ q = Queue()
 run = True
 
 #the higher this is the higher the threshold
-silence_threshold = 0 
+silence_threshold = 1
 
 # Run the demo for a timeout seconds
 timeout = time.time() + 0.5*60  # 0.5 minutes from now
@@ -41,7 +45,7 @@ data = np.zeros(feed_samples, dtype='int16')
 
 def get_spectrogram(data):
     
-    nfft = 200 # Length of each window segment
+    nfft = 300 # Length of each window segment
     fs = 8000 # Sampling frequencies
     noverlap = 120 # Overlap between windows
     nchannels = data.ndim
@@ -92,9 +96,14 @@ def initialize(debug):
     try:
         while run:
             data = q.get()
-            spectrum = get_spectrogram(data)
-            if debugMode:
-                print(spectrum)
+            print(data)
+            
+            prediction = lp.process(data)
+            
+            print(prediction)
+            
+            #if debugMode:
+                #print(prediction)
     except (KeyboardInterrupt, SystemExit):
         print("SystemExit")
         stream.stop_stream()

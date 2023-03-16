@@ -1,4 +1,4 @@
-import WakeProcessor as wp
+import LiteProcessor as lp
 import Record as r
 from multiprocessing import Process
 import os
@@ -22,6 +22,7 @@ def wake():
 def main():
     print(text2art('''HOME BOT''', font="larry3d"))
     #model = wp.initialize()
+    lp.initialize()
     r.initialize(debugMode())
 
 if __name__ == "__main__":
