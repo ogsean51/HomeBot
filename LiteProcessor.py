@@ -28,9 +28,10 @@ def preprocess(input):
 
     
     wav = tf.cast(wav, dtype=tf.float32)
+    print(wav.shape)
     #wav = tf.squeeze(wav, axis=)
 
-    wav = tfio.audio.resample(wav, rate_in=48000, rate_out=16000)
+    wav = tfio.audio.resample(wav, rate_in=44100, rate_out=16000)
     
     wav = wav[:48000]
     zero_padding = tf.zeros([48000] - tf.shape(wav), dtype=tf.float32)
