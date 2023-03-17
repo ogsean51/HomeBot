@@ -8,7 +8,6 @@ CHUNK = 512
 RECORD_SECONDS = 0.5
 WAVE_OUTPUT_FILENAME = "./Training/Data/WakeWord/"
 COMMAND = input("Command:")
-device_index = 2
 
 START = int(input("Start at: "))
 NUMBEROFFILES = int(input("Count: "))
