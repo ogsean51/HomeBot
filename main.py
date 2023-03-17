@@ -5,7 +5,7 @@ import os
 from art import *                                           
 
 def debugMode():
-    debug = input("Run in debug mode? y/n         ")
+    debug = input("Run in debug mode? y/n  -  ")
     if debug == "y" or debug =="Y":
         return True
     if debug == "n" or debug =="N":
@@ -20,7 +20,7 @@ def wake():
     print("CLEARED")
 
 def main():
-    print(text2art('''HOME BOT''', font="larry3d"))
+    print(text2art('''HOME BOT''', font="big"))
     #model = wp.initialize()
     lp.initialize()
     r.initialize(debugMode())
