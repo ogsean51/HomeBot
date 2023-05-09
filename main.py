@@ -21,7 +21,6 @@ def wake():
 
 def main():
     print(text2art('''HOME BOT''', font="big"))
-    #model = wp.initialize()
     lp.initialize()
     r.initialize(debugMode())
 

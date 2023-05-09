@@ -67,6 +67,5 @@ def process(data):
     interpreter.invoke()
     prediction = interpreter.get_tensor(output_details[0]['index'])  
 
-    print(prediction)
     return prediction
 
