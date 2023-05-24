@@ -1,5 +1,5 @@
 import LiteProcessor as lp
-import Record as r
+import AudioStream as a
 from multiprocessing import Process
 import os
 from art import *                                           
@@ -22,7 +22,7 @@ def wake():
 def main():
     print(text2art('''HOME BOT''', font="big"))
     lp.initialize()
-    r.initialize(debugMode())
+    a.initialize(debugMode())
 
 if __name__ == "__main__":
     main()
